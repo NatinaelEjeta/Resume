@@ -32,9 +32,9 @@ tailwind.config = {
 }
 </script>
 <style>
-  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #f3f4f6; display: flex; justify-content: center; padding: 20px 0; }
+  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #f3f4f6; display: flex; justify-content: center; padding: 20px 0; margin: 0; }
   
-  /* Strict A4 1-Page Constraints */
+  /* Strict A4 Edge-to-Edge Constraints */
   .resume-page {
     width: 210mm;
     height: 297mm;
@@ -42,10 +42,11 @@ tailwind.config = {
     overflow: hidden;
     box-sizing: border-box;
     background: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   }
 
-  @media screen and (max-width: 800px) {
+  /* Remove outer margins on mobile view */
+  @media screen and (max-width: 800mm) {
     .resume-page {
       width: 100%;
       height: auto;
@@ -68,10 +69,12 @@ tailwind.config = {
   .floating-action { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
   .floating-action:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4); }
 
+  /* Force exact 1-page print with 0 margins */
   @media print {
-    body { background: white !important; padding: 0 !important; margin: 0 !important; }
+    body { background: white !important; padding: 0 !important; margin: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .no-print { display: none !important; }
     .resume-page { box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; width: 210mm; height: 297mm; }
+    @page { margin: 0; size: A4 portrait; }
   }
 </style>
 </head>
@@ -86,7 +89,7 @@ tailwind.config = {
   </button>
 </div>
 
-<div class="resume-page rounded-xl flex flex-col" id="resumePage">
+<div class="resume-page flex flex-col" id="resumePage">
 
   <!-- ===== HEADER ===== -->
   <section class="relative bg-resume-dark text-white overflow-hidden flex-shrink-0">
@@ -132,6 +135,7 @@ tailwind.config = {
   </section>
 
   <!-- ===== BODY ===== -->
+  <!-- flex-1 makes this section grow to push footer to exact bottom -->
   <div class="flex flex-1 overflow-hidden">
 
     <!-- ===== LEFT SIDEBAR ===== -->
@@ -172,7 +176,7 @@ tailwind.config = {
     </aside>
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main class="flex-1 px-4 py-3 overflow-hidden">
+    <main class="flex-1 px-4 py-3 overflow-hidden flex flex-col">
 
       <section>
         <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
@@ -360,7 +364,8 @@ tailwind.config = {
         </div>
       </section>
 
-      <section class="mt-2">
+      <!-- mt-auto forces this section to the absolute bottom -->
+      <section class="mt-auto pt-2">
         <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
           <span class="w-3 h-px bg-resume-highlight"></span> Additional Info
         </h2>
@@ -414,15 +419,15 @@ function showToast(msg, icon = '') {
 }
 
 function downloadPDF() {
-  showToast('Generating 1-page PDF...', '📄');
+  showToast('Generating exact 1-page PDF...', '📄');
   document.querySelectorAll('.skill-bar-fill').forEach(bar => { bar.style.width = bar.dataset.width; });
   const element = document.getElementById('resumePage');
   const opt = {
-    margin:       0, // Strict 0 margin
+    margin:       0, // Force 0 margin for edge-to-edge printing
     filename:     'Natinael_Ejeta_Resume.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, windowWidth: 210, windowHeight: 297 },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    image:        { type: 'jpeg', quality: 1 },
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, width: 793, height: 1122 }, // Exact A4 pixel dimensions at 96 DPI
+    jsPDF:        { unit: 'mm', format: [210, 297], orientation: 'portrait' } // Exact A4 size
   };
   setTimeout(() => {
     html2pdf().set(opt).from(element).save().then(() => { showToast('PDF Downloaded!', '✅'); });
