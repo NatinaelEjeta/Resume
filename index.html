@@ -32,391 +32,373 @@ tailwind.config = {
 }
 </script>
 <style>
-  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background: #f3f4f6; display: flex; justify-content: center; padding: 20px 0; }
+  
+  /* Strict A4 1-Page Constraints */
+  .resume-page {
+    width: 210mm;
+    height: 297mm;
+    max-height: 297mm;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+
+  @media screen and (max-width: 800px) {
+    .resume-page {
+      width: 100%;
+      height: auto;
+      max-height: none;
+      border-radius: 0 !important;
+    }
+  }
+
   .skill-bar { position: relative; overflow: hidden; border-radius: 999px; height: 4px; background: #e5e7eb; }
-  .skill-bar-fill { height: 100%; border-radius: 999px; transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); width: 0; }
-  .section-enter { opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-  .section-enter.visible { opacity: 1; transform: translateY(0); }
-  .tag-item { transition: all 0.2s ease; }
+  .skill-bar-fill { height: 100%; border-radius: 999px; width: 0; transition: width 1.2s ease; }
   .tag-item:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(233, 69, 96, 0.15); }
-  .experience-card { transition: all 0.3s ease; }
-  .experience-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-  .timeline-dot { position: relative; }
-  .timeline-dot::before { content: ''; position: absolute; left: -17px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: #e94560; border: 2px solid white; box-shadow: 0 0 0 1.5px #e94560; z-index: 10; }
-  .timeline-dot::after { content: ''; position: absolute; left: -14px; top: 14px; width: 1.5px; height: calc(100% - 6px); background: #e5e7eb; }
-  .timeline-dot:last-child::after { display: none; }
-  .avatar-ring { background: conic-gradient(#e94560 0deg, #0f3460 120deg, #1a1a2e 240deg, #e94560 360deg); padding: 2px; border-radius: 50%; }
-  .floating-action { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-  .floating-action:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4); }
   .social-link { transition: all 0.2s ease; }
-  .social-link:hover { transform: translateY(-1px); color: #e94560; }
+  .social-link:hover { color: #e94560; }
   @keyframes pulse-ring { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
   .status-pulse::before { content: ''; position: absolute; inset: -2px; border-radius: 50%; background: #22c55e; animation: pulse-ring 2s ease-out infinite; }
-  .nav-dot { transition: all 0.3s ease; }
-  .nav-dot.active { background: #e94560; transform: scale(1.4); }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 2px; }
+  .timeline-dot { position: relative; }
+  .timeline-dot::before { content: ''; position: absolute; left: -13px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: #e94560; border: 1.5px solid white; box-shadow: 0 0 0 1px #e94560; z-index: 10; }
+  .timeline-dot::after { content: ''; position: absolute; left: -11px; top: 12px; width: 1px; height: calc(100% - 4px); background: #e5e7eb; }
+  .timeline-dot:last-child::after { display: none; }
+  .floating-action { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  .floating-action:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4); }
 
   @media print {
-    body { background: white !important; }
+    body { background: white !important; padding: 0 !important; margin: 0 !important; }
     .no-print { display: none !important; }
-    .resume-page { box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+    .resume-page { box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; width: 210mm; height: 297mm; }
   }
 </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-
-<nav class="fixed right-3 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-2 no-print" id="navDots">
-  <button onclick="scrollToSection('header')" class="nav-dot w-2 h-2 rounded-full bg-gray-400 active" title="Header"></button>
-  <button onclick="scrollToSection('skills')" class="nav-dot w-2 h-2 rounded-full bg-gray-400" title="Skills"></button>
-  <button onclick="scrollToSection('experience')" class="nav-dot w-2 h-2 rounded-full bg-gray-400" title="Experience"></button>
-</nav>
+<body>
 
 <div class="fixed bottom-5 right-5 flex flex-col gap-2 z-50 no-print">
-  <button onclick="downloadPDF()" class="floating-action w-9 h-9 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg" title="Download 1-Page PDF">
+  <button onclick="downloadPDF()" class="floating-action w-9 h-9 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer" title="Download 1-Page PDF">
     <span class="iconify" data-icon="lucide:file-down" data-width="16"></span>
   </button>
-  <button onclick="downloadWord()" class="floating-action w-9 h-9 bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg" title="Download Word">
+  <button onclick="downloadWord()" class="floating-action w-9 h-9 bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer" title="Download Word">
     <span class="iconify" data-icon="lucide:file-text" data-width="16"></span>
-  </button>
-  <button onclick="toggleTheme()" class="floating-action w-9 h-9 bg-gray-800 text-white rounded-full flex items-center justify-center shadow-lg" title="Toggle Theme">
-    <span class="iconify" data-icon="lucide:sun-moon" data-width="16"></span>
   </button>
 </div>
 
-<div class="max-w-[1000px] mx-auto my-4 md:my-6">
-  <div class="resume-page bg-white rounded-xl shadow-2xl overflow-hidden" id="resumePage">
+<div class="resume-page rounded-xl flex flex-col" id="resumePage">
 
-    <!-- ===== HEADER ===== -->
-    <section id="header" class="relative bg-resume-dark text-white overflow-hidden">
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-0 right-0 w-64 h-64 rounded-full bg-resume-highlight blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-        <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-blue-500 blur-3xl translate-y-1/2 -translate-x-1/4"></div>
-      </div>
-      <div class="relative z-10 px-6 md:px-8 py-4 md:py-5">
-        <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
-          <div class="flex-shrink-0">
-            <div class="avatar-ring">
-              <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-resume-accent flex items-center justify-center text-xl md:text-2xl font-bold font-serif select-none">NE</div>
-            </div>
-          </div>
-          <div class="flex-1 text-center md:text-left">
-            <h1 class="text-2xl md:text-3xl font-bold tracking-tight font-serif">NATINAEL EJETA</h1>
-            <p class="mt-0.5 text-sm md:text-base font-light text-gray-300 tracking-wide">Software Engineer & Creative Video Editor</p>
-            <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-x-4 gap-y-1 text-[11px] text-gray-400">
-              <a href="mailto:nejeta9@gmail.com" class="social-link flex items-center gap-1 hover:text-white">
-                <span class="iconify" data-icon="lucide:mail" data-width="11"></span> nejeta9@gmail.com
-              </a>
-              <a href="tel:+251941582603" class="social-link flex items-center gap-1 hover:text-white">
-                <span class="iconify" data-icon="lucide:phone" data-width="11"></span> +251941582603
-              </a>
-              <span class="flex items-center gap-1">
-                <span class="iconify" data-icon="lucide:map-pin" data-width="11"></span> Ethiopia / Remote
-              </span>
-            </div>
-            <div class="mt-2 flex flex-wrap justify-center md:justify-start gap-1.5">
-              <a href="https://drive.google.com/file/d/1nqZGEg-LEdzj68kwhk_h66GQyTtGIfen/view?usp=drive_link" target="_blank" class="social-link inline-flex items-center gap-1 px-2.5 py-0.5 bg-white/10 hover:bg-resume-highlight/80 rounded-full text-[11px] font-medium backdrop-blur-sm transition-all">
-                <span class="iconify" data-icon="lucide:folder-open" data-width="11"></span> Portfolio
-              </a>
-              <a href="https://www.linkedin.com/jobs/" target="_blank" class="social-link inline-flex items-center gap-1 px-2.5 py-0.5 bg-white/10 hover:bg-blue-600/80 rounded-full text-[11px] font-medium backdrop-blur-sm transition-all">
-                <span class="iconify" data-icon="lucide:linkedin" data-width="11"></span> LinkedIn
-              </a>
-              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-green-500/20 rounded-full text-[11px] font-medium text-green-400">
-                <span class="relative w-1.5 h-1.5 bg-green-400 rounded-full status-pulse"></span> Available for Remote
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== BODY ===== -->
-    <div class="flex flex-col lg:flex-row">
-
-      <!-- ===== LEFT SIDEBAR ===== -->
-      <aside class="lg:w-[240px] flex-shrink-0 bg-gray-50 border-r border-gray-100 px-4 py-4">
-        
-        <div id="skills" class="section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-2 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Technical Skills
-          </h2>
-          <div class="space-y-1.5">
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">Adobe Premiere Pro</span><span class="text-resume-highlight font-semibold text-[8px]">Expert</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-highlight to-pink-400" data-width="95%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">After Effects</span><span class="text-resume-highlight font-semibold text-[8px]">Expert</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-highlight to-pink-400" data-width="92%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">DaVinci Resolve</span><span class="text-gray-500 font-semibold text-[8px]">Advanced</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="78%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">Motion Graphics</span><span class="text-gray-500 font-semibold text-[8px]">Advanced</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="85%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">Color Grading</span><span class="text-gray-500 font-semibold text-[8px]">Advanced</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="80%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">Audio Editing</span><span class="text-gray-500 font-semibold text-[8px]">Advanced</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="82%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium text-gray-700">Canva</span><span class="text-gray-500 font-semibold text-[8px]">Proficient</span></div>
-              <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-gray-500 to-gray-400" data-width="70%"></div></div>
-            </div>
-          </div>
-        </div>
-
-      </aside>
-
-      <!-- ===== MAIN CONTENT ===== -->
-      <main class="flex-1 px-5 md:px-6 py-4">
-
-        <section id="summary" class="section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Personal Summary
-          </h2>
-          <div class="relative pl-3 border-l-2 border-resume-highlight/30">
-            <p class="text-gray-600 leading-snug text-[11px]">
-              Creative and detail-oriented <strong class="text-gray-800">Video Editor</strong>, <strong class="text-gray-800">Content Creator</strong>, and <strong class="text-gray-800">Software Engineer</strong> with over <strong class="text-resume-highlight">3 years</strong> of experience producing engaging digital content for YouTube, TikTok, Instagram, and online media platforms. Skilled in Adobe Premiere Pro, After Effects, motion graphics, storytelling, sound design, and audience retention editing techniques. Combines technical problem-solving abilities with creativity, adaptability, and strong remote collaboration skills.
-            </p>
-          </div>
-        </section>
-
-        <section id="experience" class="mt-3 section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-3 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Professional Experience
-          </h2>
-
-          <div class="pl-3 border-l-2 border-gray-200 space-y-3">
-            <div class="timeline-dot relative">
-              <div class="experience-card bg-white border border-gray-100 rounded-md p-2.5 shadow-sm">
-                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-0.5 mb-1">
-                  <div>
-                    <h3 class="text-[12px] font-bold text-gray-900">Founder & Lead Content Creator / Video Editor</h3>
-                    <p class="text-[10px] text-resume-highlight font-medium mt-0.5">Self-Employed / Content Creation Business</p>
-                  </div>
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-50 text-green-700 rounded-full text-[9px] font-semibold flex-shrink-0">
-                    <span class="w-1 h-1 bg-green-500 rounded-full"></span> Jan 2023 – Present
-                  </span>
-                </div>
-                <ul class="space-y-0.5">
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Manage complete post-production workflow for multiple digital content channels across YouTube, TikTok, and Instagram.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Create engaging documentary-style, ranking, sports, comedy, and storytelling videos designed to maximize audience retention.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Edit high-quality short-form and long-form content using Adobe Premiere Pro and After Effects.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Design advanced motion graphics, transitions, subtitles, and visual effects to improve viewer engagement.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Handle audio enhancement, sound synchronization, and color grading for professional-quality output.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Optimize video formats, resolutions, and export settings for seamless publishing across multiple platforms.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Independently manage project planning, editing schedules, script organization, and final content delivery in remote environments.
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="timeline-dot relative">
-              <div class="experience-card bg-white border border-gray-100 rounded-md p-2.5 shadow-sm">
-                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-0.5 mb-1">
-                  <div>
-                    <h3 class="text-[12px] font-bold text-gray-900">Software Engineer & Digital Media Specialist</h3>
-                    <p class="text-[10px] text-resume-highlight font-medium mt-0.5">Freelance / Professional Projects</p>
-                  </div>
-                  <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded-full text-[9px] font-semibold flex-shrink-0">
-                    2019 – Dec 2022
-                  </span>
-                </div>
-                <ul class="space-y-0.5">
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Developed digital media and promotional content using creative editing and technical problem-solving skills.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Produced visually engaging promotional and social media videos tailored for different platforms and audiences.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Customized video resolutions, aspect ratios, and export settings for optimal mobile and web performance.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Assisted clients with creative direction, editing workflows, and visual storytelling solutions.
-                  </li>
-                  <li class="flex items-start gap-1.5 text-[10px] text-gray-600 leading-tight">
-                    <span class="iconify text-resume-highlight flex-shrink-0 mt-0.5" data-icon="lucide:chevron-right" data-width="10"></span>
-                    Collaborated remotely with clients and stakeholders while communicating technical and creative concepts effectively.
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="education" class="mt-3 section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Education
-          </h2>
-          <div class="experience-card bg-gradient-to-br from-resume-dark to-resume-accent rounded-md p-2.5 text-white relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-            <div class="relative z-10">
-              <div class="flex items-start gap-2">
-                <div class="w-8 h-8 bg-white/10 rounded-md flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                  <span class="iconify" data-icon="lucide:graduation-cap" data-width="16"></span>
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-[12px] font-bold">Bachelor of Science in Software Engineering</h3>
-                  <div class="flex items-center gap-2 mt-0.5">
-                    <p class="text-[10px] text-gray-300">Wolkite University</p>
-                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-white/10 rounded-full text-[9px] font-medium">
-                      <span class="iconify" data-icon="lucide:calendar" data-width="8"></span> Graduated: 2019
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="mt-2 pt-2 border-t border-white/10">
-                <div class="flex flex-wrap gap-1">
-                  <span class="px-1.5 py-0.5 bg-white/10 rounded text-[8px] font-medium backdrop-blur-sm">Technical Problem-Solving</span>
-                  <span class="px-1.5 py-0.5 bg-white/10 rounded text-[8px] font-medium backdrop-blur-sm">Digital Workflow Management</span>
-                  <span class="px-1.5 py-0.5 bg-white/10 rounded text-[8px] font-medium backdrop-blur-sm">Logical Structuring</span>
-                  <span class="px-1.5 py-0.5 bg-white/10 rounded text-[8px] font-medium backdrop-blur-sm">Efficient Pipeline Management</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Core Competencies Grid -->
-        <section class="mt-3 section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Core Competencies & Strategy
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <div class="p-2 bg-gray-50 rounded-md border border-gray-100">
-              <h3 class="text-[10px] font-bold text-resume-accent mb-1 flex items-center gap-1">
-                <span class="iconify" data-icon="lucide:trending-up" data-width="10"></span> Content Strategy
-              </h3>
-              <ul class="space-y-0.5">
-                <li class="text-[9px] text-gray-700">High-CTR Thumbnails</li>
-                <li class="text-[9px] text-gray-700">Audience Retention</li>
-                <li class="text-[9px] text-gray-700">Scriptwriting</li>
-                <li class="text-[9px] text-gray-700">Viral Trend Analysis</li>
-              </ul>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-md border border-gray-100">
-              <h3 class="text-[10px] font-bold text-resume-accent mb-1 flex items-center gap-1">
-                <span class="iconify" data-icon="lucide:users" data-width="10"></span> Soft Skills
-              </h3>
-              <ul class="space-y-0.5">
-                <li class="text-[9px] text-gray-700">Remote Collaboration</li>
-                <li class="text-[9px] text-gray-700">Time Management</li>
-                <li class="text-[9px] text-gray-700">Creative Problem Solving</li>
-                <li class="text-[9px] text-gray-700">Attention to Detail</li>
-              </ul>
-            </div>
-            <div class="p-2 bg-gray-50 rounded-md border border-gray-100">
-              <h3 class="text-[10px] font-bold text-resume-accent mb-1 flex items-center gap-1">
-                <span class="iconify" data-icon="lucide:cpu" data-width="10"></span> Technical Expertise
-              </h3>
-              <ul class="space-y-0.5">
-                <li class="text-[9px] text-gray-700">Motion Graphics & VFX</li>
-                <li class="text-[9px] text-gray-700">Audio Mixing & Design</li>
-                <li class="text-[9px] text-gray-700">Color Grading</li>
-                <li class="text-[9px] text-gray-700">Codecs & Optimization</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- Video & Post-Production -->
-        <section class="mt-3 section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Video & Post-Production
-          </h2>
-          <div class="flex flex-wrap gap-1">
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Timeline Editing</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Visual Storytelling</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Multi-Camera</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Documentary</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Ranking Videos</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Social Media</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Short-form</span>
-            <span class="tag-item px-2 py-0.5 bg-white border border-gray-200 rounded text-[9px] font-medium text-gray-700 cursor-default">Long-form</span>
-          </div>
-        </section>
-
-        <!-- Additional Info -->
-        <section class="mt-3 section-enter">
-          <h2 class="text-[9px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1.5">
-            <span class="w-3 h-px bg-resume-highlight"></span> Additional Information
-          </h2>
-          <div class="grid grid-cols-2 gap-1.5">
-            <div class="flex items-center gap-1.5 p-1.5 bg-green-50 rounded-md">
-              <span class="iconify text-green-600" data-icon="lucide:wifi" data-width="12"></span>
-              <span class="text-[9px] text-green-800 font-medium">Available for Remote Work</span>
-            </div>
-            <div class="flex items-center gap-1.5 p-1.5 bg-blue-50 rounded-md">
-              <span class="iconify text-blue-600" data-icon="lucide:zap" data-width="12"></span>
-              <span class="text-[9px] text-blue-800 font-medium">Fast-Paced Workflows</span>
-            </div>
-            <div class="flex items-center gap-1.5 p-1.5 bg-amber-50 rounded-md">
-              <span class="iconify text-amber-600" data-icon="lucide:clock" data-width="12"></span>
-              <span class="text-[9px] text-amber-800 font-medium">Meets Tight Deadlines</span>
-            </div>
-            <div class="flex items-center gap-1.5 p-1.5 bg-purple-50 rounded-md">
-              <span class="iconify text-purple-600" data-icon="lucide:youtube" data-width="12"></span>
-              <span class="text-[9px] text-purple-800 font-medium">YouTube Optimization</span>
-            </div>
-          </div>
-          
-          <div class="mt-2 p-2 bg-gradient-to-r from-resume-highlight/5 to-resume-accent/5 rounded-md border border-resume-highlight/10">
-            <div class="flex items-center gap-1.5">
-              <span class="iconify text-resume-highlight flex-shrink-0" data-icon="lucide:heart" data-width="12"></span>
-              <p class="text-[9px] text-gray-700 font-medium leading-tight">Passionate About Creative Storytelling & Digital Media Production</p>
-            </div>
-          </div>
-        </section>
-
-      </main>
+  <!-- ===== HEADER ===== -->
+  <section class="relative bg-resume-dark text-white overflow-hidden flex-shrink-0">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 right-0 w-64 h-64 rounded-full bg-resume-highlight blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-blue-500 blur-3xl translate-y-1/2 -translate-x-1/4"></div>
     </div>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="bg-gray-50 border-t border-gray-100 px-6 md:px-8 py-2">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-1">
-        <p class="text-[8px] text-gray-400">© 2024 Natinael Ejeta. All rights reserved.</p>
-        <div class="flex items-center gap-2">
-          <a href="mailto:nejeta9@gmail.com" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:mail" data-width="12"></span></a>
-          <a href="https://drive.google.com/file/d/1nqZGEg-LEdzj68kwhk_h66GQyTtGIfen/view?usp=drive_link" target="_blank" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:folder-open" data-width="12"></span></a>
-          <a href="https://www.linkedin.com/jobs/" target="_blank" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:linkedin" data-width="12"></span></a>
+    <div class="relative z-10 px-6 py-3">
+      <div class="flex items-center gap-4">
+        <div class="flex-shrink-0">
+          <div class="bg-gradient-to-br from-resume-highlight to-resume-accent p-0.5 rounded-full">
+            <div class="w-14 h-14 rounded-full bg-resume-accent flex items-center justify-center text-lg font-bold font-serif select-none">NE</div>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h1 class="text-xl font-bold tracking-tight font-serif">NATINAEL EJETA</h1>
+          <p class="text-xs font-light text-gray-300 tracking-wide">Software Engineer & Creative Video Editor</p>
+          <div class="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-[9px] text-gray-400">
+            <a href="mailto:nejeta9@gmail.com" class="social-link flex items-center gap-1 hover:text-white">
+              <span class="iconify" data-icon="lucide:mail" data-width="10"></span> nejeta9@gmail.com
+            </a>
+            <a href="tel:+251941582603" class="social-link flex items-center gap-1 hover:text-white">
+              <span class="iconify" data-icon="lucide:phone" data-width="10"></span> +251941582603
+            </a>
+            <span class="flex items-center gap-1">
+              <span class="iconify" data-icon="lucide:map-pin" data-width="10"></span> Ethiopia / Remote
+            </span>
+          </div>
+          <div class="mt-1 flex flex-wrap gap-1.5">
+            <a href="https://drive.google.com/file/d/1nqZGEg-LEdzj68kwhk_h66GQyTtGIfen/view?usp=drive_link" target="_blank" class="social-link inline-flex items-center gap-1 px-2 py-0.5 bg-white/10 hover:bg-resume-highlight/80 rounded-full text-[9px] font-medium backdrop-blur-sm transition-all">
+              <span class="iconify" data-icon="lucide:folder-open" data-width="9"></span> Portfolio
+            </a>
+            <a href="https://www.linkedin.com/jobs/" target="_blank" class="social-link inline-flex items-center gap-1 px-2 py-0.5 bg-white/10 hover:bg-blue-600/80 rounded-full text-[9px] font-medium backdrop-blur-sm transition-all">
+              <span class="iconify" data-icon="lucide:linkedin" data-width="9"></span> LinkedIn
+            </a>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-500/20 rounded-full text-[9px] font-medium text-green-400">
+              <span class="relative w-1 h-1 bg-green-400 rounded-full status-pulse"></span> Available for Remote
+            </span>
+          </div>
         </div>
       </div>
-    </footer>
+    </div>
+  </section>
 
+  <!-- ===== BODY ===== -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside class="w-[55mm] flex-shrink-0 bg-gray-50 border-r border-gray-100 px-3 py-3 overflow-hidden">
+      <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1">
+        <span class="w-3 h-px bg-resume-highlight"></span> Technical Skills
+      </h2>
+      <div class="space-y-1">
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">Premiere Pro</span><span class="text-resume-highlight font-semibold text-[7px]">Expert</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-highlight to-pink-400" data-width="95%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">After Effects</span><span class="text-resume-highlight font-semibold text-[7px]">Expert</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-highlight to-pink-400" data-width="92%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">DaVinci Resolve</span><span class="text-gray-500 font-semibold text-[7px]">Adv.</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="78%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">Motion Graphics</span><span class="text-gray-500 font-semibold text-[7px]">Adv.</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="85%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">Color Grading</span><span class="text-gray-500 font-semibold text-[7px]">Adv.</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="80%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">Audio Editing</span><span class="text-gray-500 font-semibold text-[7px]">Adv.</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-resume-accent to-blue-400" data-width="82%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-[8px] mb-0.5"><span class="font-medium text-gray-700">Canva</span><span class="text-gray-500 font-semibold text-[7px]">Prof.</span></div>
+          <div class="skill-bar"><div class="skill-bar-fill bg-gradient-to-r from-gray-500 to-gray-400" data-width="70%"></div></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="flex-1 px-4 py-3 overflow-hidden">
+
+      <section>
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Personal Summary
+        </h2>
+        <div class="relative pl-2 border-l-2 border-resume-highlight/30">
+          <p class="text-gray-600 leading-snug text-[9px]">
+            Creative and detail-oriented <strong class="text-gray-800">Video Editor</strong>, <strong class="text-gray-800">Content Creator</strong>, and <strong class="text-gray-800">Software Engineer</strong> with over <strong class="text-resume-highlight">3 years</strong> of experience producing engaging digital content for YouTube, TikTok, Instagram, and online media platforms. Skilled in Adobe Premiere Pro, After Effects, motion graphics, storytelling, sound design, and audience retention editing techniques. Combines technical problem-solving abilities with creativity, adaptability, and strong remote collaboration skills.
+          </p>
+        </div>
+      </section>
+
+      <section class="mt-2">
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1.5 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Professional Experience
+        </h2>
+
+        <div class="pl-2 border-l border-gray-200 space-y-1.5">
+          <div class="timeline-dot relative">
+            <div class="bg-white border border-gray-100 rounded p-2 shadow-xs">
+              <div class="flex justify-between items-start gap-1 mb-0.5">
+                <div>
+                  <h3 class="text-[10px] font-bold text-gray-900 leading-tight">Founder & Lead Content Creator / Video Editor</h3>
+                  <p class="text-[8px] text-resume-highlight font-medium">Self-Employed / Content Creation Business</p>
+                </div>
+                <span class="inline-flex items-center gap-0.5 px-1 py-0.5 bg-green-50 text-green-700 rounded-full text-[7px] font-semibold flex-shrink-0">
+                  <span class="w-1 h-1 bg-green-500 rounded-full"></span> Jan 2023 – Present
+                </span>
+              </div>
+              <ul class="space-y-0">
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Manage complete post-production workflow for multiple digital content channels across YouTube, TikTok, and Instagram.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Create engaging documentary-style, ranking, sports, comedy, and storytelling videos to maximize audience retention.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Edit high-quality short-form and long-form content using Adobe Premiere Pro and After Effects.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Design advanced motion graphics, transitions, subtitles, and visual effects to improve viewer engagement.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Handle audio enhancement, sound synchronization, and color grading for professional-quality output.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Optimize video formats, resolutions, and export settings for seamless publishing across platforms.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Independently manage project planning, editing schedules, script organization, and delivery remotely.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="timeline-dot relative">
+            <div class="bg-white border border-gray-100 rounded p-2 shadow-xs">
+              <div class="flex justify-between items-start gap-1 mb-0.5">
+                <div>
+                  <h3 class="text-[10px] font-bold text-gray-900 leading-tight">Software Engineer & Digital Media Specialist</h3>
+                  <p class="text-[8px] text-resume-highlight font-medium">Freelance / Professional Projects</p>
+                </div>
+                <span class="inline-flex items-center gap-0.5 px-1 py-0.5 bg-gray-100 text-gray-600 rounded-full text-[7px] font-semibold flex-shrink-0">
+                  2019 – Dec 2022
+                </span>
+              </div>
+              <ul class="space-y-0">
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Developed digital media and promotional content using creative editing and technical problem-solving skills.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Produced visually engaging promotional and social media videos tailored for different platforms and audiences.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Customized video resolutions, aspect ratios, and export settings for optimal mobile and web performance.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Assisted clients with creative direction, editing workflows, and visual storytelling solutions.
+                </li>
+                <li class="flex items-start gap-1 text-[8px] text-gray-600 leading-snug">
+                  <span class="iconify text-resume-highlight flex-shrink-0 mt-px" data-icon="lucide:chevron-right" data-width="8"></span>
+                  Collaborated remotely with clients while communicating technical and creative concepts effectively.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-2">
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Education
+        </h2>
+        <div class="bg-gradient-to-br from-resume-dark to-resume-accent rounded p-2 text-white relative overflow-hidden">
+          <div class="relative z-10">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 bg-white/10 rounded flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                <span class="iconify" data-icon="lucide:graduation-cap" data-width="12"></span>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-[10px] font-bold leading-tight">Bachelor of Science in Software Engineering</h3>
+                <div class="flex items-center gap-2">
+                  <p class="text-[8px] text-gray-300">Wolkite University</p>
+                  <span class="inline-flex items-center gap-0.5 px-1 py-0.5 bg-white/10 rounded-full text-[7px] font-medium">
+                    <span class="iconify" data-icon="lucide:calendar" data-width="7"></span> 2019
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-1 pt-1 border-t border-white/10 flex flex-wrap gap-0.5">
+              <span class="px-1 py-0.5 bg-white/10 rounded text-[7px] font-medium backdrop-blur-sm">Problem-Solving</span>
+              <span class="px-1 py-0.5 bg-white/10 rounded text-[7px] font-medium backdrop-blur-sm">Workflow Management</span>
+              <span class="px-1 py-0.5 bg-white/10 rounded text-[7px] font-medium backdrop-blur-sm">Logical Structuring</span>
+              <span class="px-1 py-0.5 bg-white/10 rounded text-[7px] font-medium backdrop-blur-sm">Pipeline Management</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-2">
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Core Competencies
+        </h2>
+        <div class="grid grid-cols-3 gap-1">
+          <div class="p-1 bg-gray-50 rounded border border-gray-100">
+            <h3 class="text-[8px] font-bold text-resume-accent mb-0.5 flex items-center gap-0.5">
+              <span class="iconify" data-icon="lucide:trending-up" data-width="8"></span> Strategy
+            </h3>
+            <ul class="space-y-0">
+              <li class="text-[7px] text-gray-700">High-CTR Thumbnails</li>
+              <li class="text-[7px] text-gray-700">Audience Retention</li>
+              <li class="text-[7px] text-gray-700">Scriptwriting</li>
+              <li class="text-[7px] text-gray-700">Viral Trend Analysis</li>
+            </ul>
+          </div>
+          <div class="p-1 bg-gray-50 rounded border border-gray-100">
+            <h3 class="text-[8px] font-bold text-resume-accent mb-0.5 flex items-center gap-0.5">
+              <span class="iconify" data-icon="lucide:users" data-width="8"></span> Soft Skills
+            </h3>
+            <ul class="space-y-0">
+              <li class="text-[7px] text-gray-700">Remote Collaboration</li>
+              <li class="text-[7px] text-gray-700">Time Management</li>
+              <li class="text-[7px] text-gray-700">Creative Problem Solving</li>
+              <li class="text-[7px] text-gray-700">Attention to Detail</li>
+            </ul>
+          </div>
+          <div class="p-1 bg-gray-50 rounded border border-gray-100">
+            <h3 class="text-[8px] font-bold text-resume-accent mb-0.5 flex items-center gap-0.5">
+              <span class="iconify" data-icon="lucide:cpu" data-width="8"></span> Technical
+            </h3>
+            <ul class="space-y-0">
+              <li class="text-[7px] text-gray-700">Motion Graphics & VFX</li>
+              <li class="text-[7px] text-gray-700">Audio Mixing & Design</li>
+              <li class="text-[7px] text-gray-700">Color Grading</li>
+              <li class="text-[7px] text-gray-700">Codecs & Optimization</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-2">
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Video & Post-Production
+        </h2>
+        <div class="flex flex-wrap gap-0.5">
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Timeline Editing</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Visual Storytelling</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Multi-Camera</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Documentary</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Ranking Videos</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Social Media</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Short-form</span>
+          <span class="tag-item px-1.5 py-0.5 bg-white border border-gray-200 rounded text-[7px] font-medium text-gray-700 cursor-default">Long-form</span>
+        </div>
+      </section>
+
+      <section class="mt-2">
+        <h2 class="text-[8px] font-bold uppercase tracking-[0.15em] text-resume-highlight mb-1 flex items-center gap-1">
+          <span class="w-3 h-px bg-resume-highlight"></span> Additional Info
+        </h2>
+        <div class="grid grid-cols-4 gap-0.5">
+          <div class="flex items-center gap-1 p-1 bg-green-50 rounded">
+            <span class="iconify text-green-600" data-icon="lucide:wifi" data-width="9"></span>
+            <span class="text-[7px] text-green-800 font-medium">Remote</span>
+          </div>
+          <div class="flex items-center gap-1 p-1 bg-blue-50 rounded">
+            <span class="iconify text-blue-600" data-icon="lucide:zap" data-width="9"></span>
+            <span class="text-[7px] text-blue-800 font-medium">Fast-Paced</span>
+          </div>
+          <div class="flex items-center gap-1 p-1 bg-amber-50 rounded">
+            <span class="iconify text-amber-600" data-icon="lucide:clock" data-width="9"></span>
+            <span class="text-[7px] text-amber-800 font-medium">Deadlines</span>
+          </div>
+          <div class="flex items-center gap-1 p-1 bg-purple-50 rounded">
+            <span class="iconify text-purple-600" data-icon="lucide:youtube" data-width="9"></span>
+            <span class="text-[7px] text-purple-800 font-medium">YouTube SEO</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-gray-50 border-t border-gray-100 px-6 py-1.5 flex-shrink-0">
+    <div class="flex items-center justify-between">
+      <p class="text-[7px] text-gray-400">© 2024 Natinael Ejeta • Passionate About Creative Storytelling & Digital Media Production</p>
+      <div class="flex items-center gap-2">
+        <a href="mailto:nejeta9@gmail.com" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:mail" data-width="10"></span></a>
+        <a href="https://drive.google.com/file/d/1nqZGEg-LEdzj68kwhk_h66GQyTtGIfen/view?usp=drive_link" target="_blank" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:folder-open" data-width="10"></span></a>
+        <a href="https://www.linkedin.com/jobs/" target="_blank" class="social-link text-gray-400 hover:text-resume-highlight"><span class="iconify" data-icon="lucide:linkedin" data-width="10"></span></a>
+      </div>
+    </div>
+  </footer>
+
 </div>
 
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-resume-dark text-white px-4 py-2 rounded-full text-xs font-medium shadow-2xl z-[100] opacity-0 translate-y-4 transition-all duration-300 pointer-events-none flex items-center gap-2">
@@ -424,32 +406,6 @@ tailwind.config = {
 </div>
 
 <script>
-const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -30px 0px' };
-const skillObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const bars = entry.target.querySelectorAll('.skill-bar-fill');
-      bars.forEach((bar, i) => { setTimeout(() => { bar.style.width = bar.dataset.width; }, i * 80); });
-      skillObserver.unobserve(entry.target);
-    }
-  });
-}, observerOptions);
-document.querySelectorAll('.section-enter').forEach(el => { skillObserver.observe(el); });
-
-const sectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); } });
-}, { threshold: 0.1 });
-document.querySelectorAll('.section-enter').forEach(el => { sectionObserver.observe(el); });
-
-const sections = ['header', 'skills', 'experience'];
-const navDots = document.querySelectorAll('.nav-dot');
-function scrollToSection(id) { const el = document.getElementById(id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
-window.addEventListener('scroll', () => {
-  let current = '';
-  sections.forEach(id => { const el = document.getElementById(id); if (el) { const rect = el.getBoundingClientRect(); if (rect.top <= 150) current = id; } });
-  navDots.forEach((dot, i) => { dot.classList.toggle('active', sections[i] === current); });
-});
-
 function showToast(msg, icon = '') {
   const toast = document.getElementById('toast'), toastMsg = document.getElementById('toastMsg'), toastIcon = document.getElementById('toastIcon');
   toastMsg.textContent = msg; toastIcon.textContent = icon;
@@ -457,34 +413,16 @@ function showToast(msg, icon = '') {
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(16px)'; }, 2500);
 }
 
-let isDark = false;
-function toggleTheme() {
-  isDark = !isDark; const page = document.getElementById('resumePage');
-  if (isDark) {
-    page.style.background = '#1a1a2e';
-    page.querySelectorAll('main, aside').forEach(el => { el.style.background = '#16213e'; el.style.color = '#e5e7eb'; });
-    page.querySelectorAll('h1, h2, h3, h4').forEach(el => { if (!el.closest('#header')) el.style.color = '#f1f5f9'; });
-    page.querySelectorAll('.experience-card, .bg-gray-50').forEach(el => { el.style.background = '#1e2d4a'; el.style.borderColor = '#2a3f5f'; });
-    page.querySelectorAll('footer').forEach(el => { el.style.background = '#0f1b2d'; el.style.borderColor = '#1e2d4a'; });
-    showToast('Dark mode enabled', '🌙');
-  } else {
-    page.style.background = '';
-    page.querySelectorAll('main, aside, h1, h2, h3, h4, .experience-card, .bg-gray-50, footer').forEach(el => { el.style.background = ''; el.style.borderColor = ''; el.style.color = ''; });
-    showToast('Light mode enabled', '☀️');
-  }
-}
-
 function downloadPDF() {
   showToast('Generating 1-page PDF...', '📄');
   document.querySelectorAll('.skill-bar-fill').forEach(bar => { bar.style.width = bar.dataset.width; });
   const element = document.getElementById('resumePage');
   const opt = {
-    margin:       [0.1, 0.1, 0.1, 0.1], // Ultra-tight margins for 1 page
+    margin:       0, // Strict 0 margin
     filename:     'Natinael_Ejeta_Resume.pdf',
     image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0 },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0, windowWidth: 210, windowHeight: 297 },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
   setTimeout(() => {
     html2pdf().set(opt).from(element).save().then(() => { showToast('PDF Downloaded!', '✅'); });
@@ -508,8 +446,7 @@ function downloadWord() {
 }
 
 setTimeout(() => {
-  document.querySelectorAll('.section-enter').forEach(el => { const rect = el.getBoundingClientRect(); if (rect.top < window.innerHeight) { el.classList.add('visible'); } });
-  document.querySelectorAll('.skill-bar-fill').forEach(bar => { const rect = bar.getBoundingClientRect(); if (rect.top < window.innerHeight) { bar.style.width = bar.dataset.width; } });
+  document.querySelectorAll('.skill-bar-fill').forEach(bar => { bar.style.width = bar.dataset.width; });
 }, 200);
 </script>
 
