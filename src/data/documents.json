@@ -1,0 +1,10 @@
+{
+  "title": "My Document",
+  "file": "my-document-all.pdf",
+  "ext": "pdf",
+  "groups": [
+    { "group": "Educational", "names": ["University Transcript and Temporary (Software Engineering)", "Entrance", "High School Transcript", "8th Grade Ministry"] },
+    { "group": "Certificate", "names": ["Cisco CCNA", "National Qualification Certificate", "System Administration", "IT Support"] },
+    { "group": "Experience", "names": ["Work Experience"] }
+  ]
+}
