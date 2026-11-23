@@ -2,6 +2,7 @@ import { Mail, Phone, MapPin, ExternalLink, Wifi, Briefcase, Clock, MessageSquar
 import type { ReactNode } from "react";
 import DocumentsSection from "@/components/DocumentsSection";
 import DownloadPdfButton from "@/components/DownloadPdfButton";
+import MoreProjects from "@/components/MoreProjects";
 
 const contacts: { icon: typeof Mail; text: string; href?: string }[] = [
   { icon: Mail, text: "nejeta9@gmail.com", href: "mailto:nejeta9@gmail.com" },
@@ -168,6 +169,23 @@ function Bullets({ items }: { items: string[] }) {
   );
 }
 
+function ProjectItem({ p }: { p: (typeof projects)[number] }) {
+  return (
+    <div className="print:break-inside-avoid">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-[13px] font-bold text-slate-900">{p.name}</h3>
+        <span className="text-[10.5px] font-semibold">
+          {p.live && <a href={p.live} className="text-blue-600 hover:underline">Live demo</a>}
+          {p.live && <span className="mx-1.5 text-slate-300">|</span>}
+          <a href={p.code} className="text-blue-600 hover:underline">Code</a>
+        </span>
+      </div>
+      <p className="text-[11px] text-blue-600">{p.stack}</p>
+      <Bullets items={p.bullets} />
+    </div>
+  );
+}
+
 export default function Page() {
   return (
     <main className="min-h-screen bg-slate-200/70 px-3 py-8 font-sans text-slate-800 print:bg-white print:p-0">
@@ -248,21 +266,17 @@ export default function Page() {
 
             <Heading>Projects</Heading>
             <div className="space-y-5">
-              {projects.map((p) => (
-                <div key={p.name} className="print:break-inside-avoid">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="text-[13px] font-bold text-slate-900">{p.name}</h3>
-                    <span className="text-[10.5px] font-semibold">
-                      {p.live && <a href={p.live} className="text-blue-600 hover:underline">Live demo</a>}
-                      {p.live && <span className="mx-1.5 text-slate-300">|</span>}
-                      <a href={p.code} className="text-blue-600 hover:underline">Code</a>
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-blue-600">{p.stack}</p>
-                  <Bullets items={p.bullets} />
-                </div>
+              {projects.slice(0, 2).map((p) => (
+                <ProjectItem key={p.name} p={p} />
               ))}
             </div>
+            <MoreProjects count={projects.length - 2}>
+              <div className="space-y-5 pt-5">
+                {projects.slice(2).map((p) => (
+                  <ProjectItem key={p.name} p={p} />
+                ))}
+              </div>
+            </MoreProjects>
 
             <Heading>Education</Heading>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
