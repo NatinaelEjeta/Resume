@@ -266,13 +266,13 @@ export default function Page() {
 
             <Heading>Projects</Heading>
             <div className="space-y-5">
-              {projects.slice(0, 2).map((p) => (
+              {projects.filter((p) => p.name === "School Management System").map((p) => (
                 <ProjectItem key={p.name} p={p} />
               ))}
             </div>
-            <MoreProjects count={projects.length - 2}>
+            <MoreProjects count={projects.length - 1}>
               <div className="space-y-5 pt-5">
-                {projects.slice(2).map((p) => (
+                {projects.filter((p) => p.name !== "School Management System").map((p) => (
                   <ProjectItem key={p.name} p={p} />
                 ))}
               </div>
