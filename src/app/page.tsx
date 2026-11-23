@@ -267,10 +267,10 @@ export default function Page() {
             <Heading>Education</Heading>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div>
-                <h3 className="text-[13px] font-bold text-slate-900">Bachelor's degree</h3>
+                <h3 className="text-[13px] font-bold text-slate-900">Bachelor of Software Engineering</h3>
                 <p className="text-[11px] text-slate-500">Wolkite University</p>
               </div>
-              <span className="text-[10px] font-semibold text-blue-600">2016 - 2019</span>
+              <span className="text-[10px] font-semibold text-blue-600">2019</span>
             </div>
 
             <Heading>Languages</Heading>
